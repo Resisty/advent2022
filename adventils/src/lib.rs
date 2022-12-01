@@ -28,3 +28,9 @@ pub fn get_input(path: String) -> String {
         .expect(&format!("Could not read input file '{path}'. Did you get the path right?"));
     return contents
 }
+
+pub fn get_input_vec(path: String) -> Vec<String> {
+    let contents = get_input(path);
+    let vec = contents.lines().map(|l| l.to_string()).collect::<Vec<_>>();
+    return vec;
+}
