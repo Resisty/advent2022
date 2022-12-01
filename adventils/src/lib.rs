@@ -3,14 +3,14 @@ extern crate argparse;
 use argparse::{ArgumentParser, StoreTrue, Store};
 use std::fs;
 
-pub struct Options {
+pub struct OptionalArgumentsAndSuchLike {
     pub verbose: bool,
     pub input_file:  String
 }
 
-impl Options {
+impl OptionalArgumentsAndSuchLike {
     pub fn args() -> Self {
-        let mut opts = Options { verbose: false, input_file: String::from("") };
+        let mut opts = OptionalArgumentsAndSuchLike { verbose: false, input_file: String::from("") };
         {
             let mut ap = ArgumentParser::new();
             ap.refer(&mut opts.verbose)
@@ -24,7 +24,7 @@ impl Options {
 }
 
 pub fn get_input(path: String) -> String {
-    let contents = fs::read_to_string(path)
-        .expect("Could not read input file. Did you get the path right?");
+    let contents = fs::read_to_string(path.clone())
+        .expect(&format!("Could not read input file '{path}'. Did you get the path right?"));
     return contents
 }

@@ -1,5 +1,5 @@
 fn main() {
-    let opts = adventils::Options::args();
+    let opts = adventils::OptionalArgumentsAndSuchLike::args();
     println!("Used adventils::Options::args to get program options and arguments...");
     println!("Verbosity: {}", opts.verbose);
     println!("Input file: {}", opts.input_file);
