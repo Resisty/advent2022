@@ -8,9 +8,18 @@ fn main() {
 }
 
 fn find_common(lines: &[String]) -> char {
-    let (first, second, third) = (lines[0].clone(), lines[1].clone(), lines[2].clone());
-    let filtered: Vec<char> = first.chars().filter(|c| second.contains(&c.to_string()) && third.contains(&c.to_string())).collect();
+    let first = lines[0].clone();
+    let filtered: Vec<char> = first.chars().filter(|c| is_common(&c, &lines[1..])).collect(); //second.contains(&c.to_string()) && third.contains(&c.to_string())).collect();
     return filtered[0]
+}
+
+fn is_common(c: &char, cdr: &[String]) -> bool {
+    for line in cdr {
+        if !line.contains(&c.to_string()) {
+            return false
+        }
+    }
+    return true
 }
 
 fn get_priority(c: char) -> i32 {
