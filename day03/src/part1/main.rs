@@ -2,7 +2,7 @@ fn main() {
     let opts = adventils::OptionalArgumentsAndSuchLike::args();
     // implement solutions in here somewhere
     let vec_lines = adventils::get_input_vec(opts.input_file.clone());
-    let total: i32 = vec_lines.iter().map(|l| find_common(&l)).map(|c| get_priority(c)).sum();
+    let total: i32 = vec_lines.iter().map(|l| find_common(&l)).map(get_priority).sum();
     println!("Total: {total}");
 }
 

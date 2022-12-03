@@ -3,7 +3,7 @@ fn main() {
     // implement solutions in here somewhere
     let vec_lines = adventils::get_input_vec(opts.input_file.clone());
     let three_elf_groups = vec_lines.chunks(3);
-    let total: i32 = three_elf_groups.map(|l| find_common(l)).map(|c| get_priority(c)).sum();
+    let total: i32 = three_elf_groups.map(|l| find_common(l)).map(get_priority).sum();
     println!("Total: {total}");
 }
 
