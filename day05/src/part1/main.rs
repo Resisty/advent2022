@@ -34,24 +34,19 @@ fn main() {
             crates[cratebox.column].push(cratebox);
         }
     }
-    let instructions: Vec<Vec<i32>> = instruction_lines.lines()
+    let instructions: Vec<Vec<usize>> = instruction_lines.lines()
         .map(|line| line.split(' ').enumerate()
             .filter(|(ind, _)| ind % 2 == 1)
             .map(|(_, word)| word.parse().unwrap())
-            .collect::<Vec<i32>>()
+            .collect::<Vec<usize>>()
         ).collect();
-    println!("{:?}", crates);
-    println!("---");
-    println!("{:?}", instructions);
-    println!("---");
     for instruct in instructions {
         let (num, src, dest) = (instruct[0], instruct[1], instruct[2]);
         for _ in 0..num {
-            let the_crate = crates[src as usize - 1].pop().unwrap();
-            crates[dest as usize - 1].push(the_crate);
+            let the_crate = crates[src - 1].pop().unwrap();
+            crates[dest - 1].push(the_crate);
         }
     }
-    println!("{:?}", crates);
     let msg = crates.iter().map(|cratebox| cratebox.last().unwrap().name.to_string()).collect::<Vec<String>>().join("");
     println!("Message: {msg}");
 }

@@ -34,30 +34,18 @@ fn main() {
             crates[cratebox.column].push(cratebox);
         }
     }
-    let instructions: Vec<Vec<i32>> = instruction_lines.lines()
+    let instructions: Vec<Vec<usize>> = instruction_lines.lines()
         .map(|line| line.split(' ').enumerate()
             .filter(|(ind, _)| ind % 2 == 1)
             .map(|(_, word)| word.parse().unwrap())
-            .collect::<Vec<i32>>()
+            .collect::<Vec<usize>>()
         ).collect();
-    println!("{:?}", crates);
-    println!("---");
-    println!("{:?}", instructions);
-    println!("---");
     for instruct in instructions {
         let (num, src, dest) = (instruct[0], instruct[1], instruct[2]);
-        // I feel like this should be a lot easier with vec::drain()
-        // but it just errors really unhelpfully:
-        // "value of type `&mut Vec<CrateBox>` cannot be built from `std::iter::Iterator<Item=CrateBox>`"
-        let mut tmpstack = Vec::new();
-        for _ in 0..num {
-            let the_crate = crates[src as usize - 1].pop().unwrap();
-            tmpstack.push(the_crate);
-        }
-        tmpstack.reverse();
-        crates[dest as usize - 1].append(&mut tmpstack);
+        let split_index = crates[src as usize - 1].len() - num as usize;
+        let mut substack = crates[src as usize - 1].split_off(split_index);
+        crates[dest as usize - 1].append(&mut substack);
     }
-    println!("{:?}", crates);
     let msg = crates.iter().map(|cratebox| cratebox.last().unwrap().name.to_string()).collect::<Vec<String>>().join("");
     println!("Message: {msg}");
 }
