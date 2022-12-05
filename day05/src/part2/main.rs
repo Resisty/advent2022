@@ -43,7 +43,7 @@ fn main() {
     for instruct in instructions {
         let (num, src, dest) = (instruct[0], instruct[1], instruct[2]);
         let split_index = crates[src as usize - 1].len() - num as usize;
-        let mut substack = crates[src as usize - 1].split_off(split_index);
+        let mut substack = crates[src as usize - 1].drain(split_index..).as_slice().to_vec();
         crates[dest as usize - 1].append(&mut substack);
     }
     let msg = crates.iter().map(|cratebox| cratebox.last().unwrap().name.to_string()).collect::<Vec<String>>().join("");
