@@ -23,6 +23,11 @@ impl OptionalArgumentsAndSuchLike {
     }
 }
 
+pub fn get_raw_input(path: String) -> String {
+    let contents = fs::read_to_string(path.clone())
+        .expect(&format!("Could not read input file '{path}'. Did you get the path right?"));
+    return contents.to_string();
+}
 pub fn get_input(path: String) -> String {
     let contents = fs::read_to_string(path.clone())
         .expect(&format!("Could not read input file '{path}'. Did you get the path right?"));
