@@ -7,34 +7,63 @@ fn main() {
             .map(|c| c.to_string().parse().unwrap())
             .collect()
         ).collect::<Vec<Vec<i32>>>();
-    let mut answer = grid.len() * 2 + (grid[0].len() - 2) * 2; // start with all trees on periphery;
-    println!("Got grid:");
-    println!("{grid:?}");
-    println!("Visible trees before looking inward: {answer}");
-    for i in 1..grid.len() - 1 {
-        for j in  1..grid[i].len() - 1 {
+    let mut visibilities: Vec<usize> = Vec::new();
+    for i in 0..grid.len() {
+        for j in  0..grid[i].len() {
             // start inside outermost box of trees
-            let height = &grid[i][j];
-            let row = &grid[i];
-            let col = grid.iter().map(|l| l.iter().nth(j).unwrap()).collect::<Vec<_>>();
-            let row_left_max = row[0..j].iter().max().unwrap();
-            println!("Compare tree at ({i}, {j}) with height {height} to max of trees to LEFT: {row_left_max}");
-            let row_right_max = row[j+1..row.len()].iter().max().unwrap();
-            println!("Compare tree at ({i}, {j}) with height {height} to max of trees to RIGHT: {row_right_max}");
-            let col_up_max = *col[0..i].iter().max().unwrap();
-            println!("Compare tree at ({i}, {j}) with height {height} to max of trees to UP: {col_up_max}");
-            let col_down_max = *col[i+1..col.len()].iter().max().unwrap();
-            println!("Compare tree at ({i}, {j}) with height {height} to max of trees to DOWN: {col_down_max}");
-            if height > row[0..j].iter().max().unwrap()
-                || height > row[j+1..row.len()].iter().max().unwrap()
-                || height > *col[0..i].iter().max().unwrap()
-                || height > *col[i+1..col.len()].iter().max().unwrap() {
-                    answer += 1;
-                    println!("Tree at ({i}, {j}) with height {height} is VISIBLE");
-            } else {
-                println!("Tree at ({i}, {j}) with height {height} is NOT VISIBLE");
+            let mut vis: usize = 1;
+            let height = grid[i][j];
+            let mut row = grid[i].clone();
+            let row_len = row.len().clone();
+            let mut col = grid.iter().map(|l| l.iter().nth(j).unwrap().clone()).collect::<Vec<_>>();
+            let col_len = col.len().clone();
+            let row_left_max = row[0..j].iter().max().unwrap_or(&-1).clone();
+            let row_right_max = row[j+1..row.len()].iter().max().unwrap_or(&-1).clone();
+            let col_up_max = col[0..i].iter().max().unwrap_or(&&-1).clone();
+            let col_down_max = col[i+1..col.len()].iter().max().unwrap_or(&&-1).clone();
+            match row_left_max {
+                -1 => vis *= 0,
+                _ => {
+                    let split_to_max = row[0..j].rsplitn_mut(2, |h| *h >= height).collect::<Vec<_>>();
+                    vis *= match split_to_max {
+                        _ if split_to_max.len() > 1 => split_to_max[0].len() + 1,
+                        _  => split_to_max[0].len()
+                    }
+                }
             }
+            match row_right_max {
+                -1 => vis *= 0,
+                _ => {
+                    let split_to_max = row[j+1..row_len].splitn_mut(2, |h| *h >= height).collect::<Vec<_>>();
+                    vis *= match split_to_max {
+                        _ if split_to_max.len() > 1 => split_to_max[0].len() + 1,
+                        _  => split_to_max[0].len()
+                    }
+                }
+            }
+            match col_up_max {
+                -1 => vis *= 0,
+                _ => {
+                    let split_to_max = col[0..i].rsplitn_mut(2, |h| *h >= height).collect::<Vec<_>>();
+                    vis *= match split_to_max {
+                        _ if split_to_max.len() > 1 => split_to_max[0].len() + 1,
+                        _  => split_to_max[0].len()
+                    }
+                }
+            }
+            match col_down_max {
+                -1 => vis *= 0,
+                _ => {
+                    let split_to_max = col[i+1..col_len].splitn_mut(2, |h| *h >= height).collect::<Vec<_>>();
+                    vis *= match split_to_max {
+                        _ if split_to_max.len() > 1 => split_to_max[0].len() + 1,
+                        _  => split_to_max[0].len()
+                    }
+                }
+            }
+            visibilities.push(vis);
         }
     }
+    let answer = visibilities.iter().max().unwrap();
     println!("Number of visible trees: {answer}");
 }
