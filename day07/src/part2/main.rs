@@ -96,37 +96,24 @@ fn main() {
     let mut tree = Tree::new();
     let mut current = Some(NodeId{index: 0});
     for line in lines {
-        match line {
-            _ if line.starts_with("$") => {
-                let tokens: Vec<&str> = line.split(" ").collect();
-                match tokens {
-                    _ if tokens[1] == "ls" => {
-                        // ignore it.
+        match line.split(" ").collect::<Vec<&str>>().as_slice() {
+            ["$", "cd", directory] => {
+                match directory {
+                    _ if directory == &".." => {
+                        // get parent of current.
+                        current = tree.get_node(current).unwrap().parent;
                     },
-                    _ if tokens[1] == "cd" => {
-                        let directory = tokens[2];
-                        match directory {
-                            _ if directory == ".." => {
-                                // get parent of current.
-                                current = tree.get_node(current).unwrap().parent;
-                            },
-                            _ =>  {
-                                //  append to current and update
-                                current = tree.append(current, tokens[2].to_string());
-                            }
-                        }
-                    },
-                    _ => panic!("Shit")
-                }
+                    _ =>  {
+                        //  append to current and update
+                        current = tree.append(current, directory.to_string());
+                    }
+                };
             },
-            _ if line.starts_with("dir") => {
-                //  ignore it.
-            },
-            _ => {
-                let tokens: Vec<&str> = line.split(" ").collect();
-                tree.add_file_size(current, tokens[1].to_string(), tokens[0].parse().unwrap());
-            }
-        };
+            ["$", "ls"] => continue,
+            ["dir", _] => continue,
+            [filesize, filename] => tree.add_file_size(current, filename.to_string(), filesize.parse().unwrap()),
+            _ => println!("Indecipherable line: {}", line)
+        }
     }
 
     let free = TOTAL_DISK - tree.nodes[0].filesize as i32;
