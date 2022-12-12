@@ -10,18 +10,6 @@ impl Coord {
     fn from_pt(p: &Point) -> Coord {
         Coord { x: p.x.clone(), y: p.y.clone() }
     }
-    fn up(&self) -> Coord {
-        Coord { x: self.x, y: self.y - 1}
-    }
-    fn down(&self) -> Coord {
-        Coord { x: self.x, y: self.y + 1}
-    }
-    fn left(&self) -> Coord {
-        Coord { x: self.x - 1, y: self.y}
-    }
-    fn right(&self) -> Coord {
-        Coord { x: self.x + 1, y: self.y}
-    }
 }
 
 impl fmt::Display for Coord {
@@ -46,11 +34,25 @@ pub enum PointKind {
 #[derive(Clone,Default,Debug)]
 struct Point {
     kind: PointKind,
-    visited: bool,
     distance: i32,
     x: i32,
     y: i32,
     height: i32,
+}
+
+impl Point {
+    fn up(&self) -> Coord {
+        Coord { x: self.x, y: self.y - 1}
+    }
+    fn down(&self) -> Coord {
+        Coord { x: self.x, y: self.y + 1}
+    }
+    fn left(&self) -> Coord {
+        Coord { x: self.x - 1, y: self.y}
+    }
+    fn right(&self) -> Coord {
+        Coord { x: self.x + 1, y: self.y}
+    }
 }
 
 impl fmt::Display for Point {
@@ -80,7 +82,6 @@ fn main() {
             let c = Coord{x: x as i32, y: y as i32};
             let pt = Point {
                 kind,
-                visited: false,
                 distance,
                 x: x as i32,
                 y: y as i32,
@@ -103,7 +104,6 @@ fn main() {
                 }
             }
         }
-        current.visited = true;
         points.remove(&Coord::from_pt(&current));
         if current.kind == PointKind::End {
             break // Nowhere else to go
@@ -125,12 +125,8 @@ fn printit(points: &HashMap<Coord,Point>, w: i32, h: i32) {
         let mut s = String::from("");
         for x in 0..w {
             match points.get(&Coord{x, y}) {
-                Some(p) => {
-                    if p.visited {
-                        s.push_str("#");
-                    } else {
-                        s.push_str(".");
-                    }
+                Some(_) => {
+                    s.push_str(".");
                 },
                 None => {
                     s.push_str("#");
@@ -139,23 +135,19 @@ fn printit(points: &HashMap<Coord,Point>, w: i32, h: i32) {
         }
         println!("{s}");
     }
+    println!("---");
 }
 
 fn get_unvisited_neighbors(current: &Point, points: &HashMap<Coord,Point>) -> Vec<Coord> {
     let mut coords: Vec<Coord> = Vec::new();
-    let (u, r, d, l) = (Coord::from_pt(current).up(), Coord::from_pt(current).right(), Coord::from_pt(current).down(), Coord::from_pt(current).left());
+    let (u, r, d, l) = (current.up(), current.right(), current.down(), current.left());
     for c in [u, r, d, l] {
         match points.get(&c) {
             None => (), // off the map
             Some(pt) => {
-                match pt.visited {
-                    true => (), // do not consider visted points
-                    false => {
-                        // make sure it's climbable
-                        if pt.height <= current.height + 1 {
-                            coords.push(c)
-                        }
-                    }
+                // make sure it's climbable
+                if pt.height <= current.height + 1 {
+                    coords.push(c)
                 }
             }
         }
